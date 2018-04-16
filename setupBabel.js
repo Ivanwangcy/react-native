@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 'use strict';
@@ -13,7 +11,7 @@ const babelRegisterOnly = require('metro/src/babelRegisterOnly');
 const escapeRegExp = require('lodash/escapeRegExp');
 const path = require('path');
 
-const BABEL_ENABLED_PATHS = ['local-cli'];
+const BABEL_ENABLED_PATHS = ['local-cli', 'metro'];
 
 /**
  * We use absolute paths for matching only the top-level folders reliably. For
@@ -23,20 +21,24 @@ const BABEL_ENABLED_PATHS = ['local-cli'];
 function buildRegExps(basePath, dirPaths) {
   return dirPaths.map(
     folderPath =>
-      // Babel `only` option works with forward slashes in the RegExp so replace
-      // backslashes for Windows.
-      folderPath instanceof RegExp
-        ? new RegExp(
-            `^${escapeRegExp(
-              path.resolve(basePath, '.').replace(/\\/g, '/')
-            )}/${folderPath.source}`,
-            folderPath.flags
-          )
-        : new RegExp(
-            `^${escapeRegExp(
-              path.resolve(basePath, folderPath).replace(/\\/g, '/')
-            )}`
-          )
+      folderPath === 'metro'
+        // metro uses flow (for example) which needs to be stripped out w/babel.
+        // it'll resolve to .../metro/packages/metro/src/index.js we want root
+        ? path.resolve(require.resolve('metro'), '..', '..', '..', '..')
+        // Babel `only` option works with forward slashes in the RegExp so replace
+        // backslashes for Windows.
+        : folderPath instanceof RegExp
+          ? new RegExp(
+              `^${escapeRegExp(
+                path.resolve(basePath, '.').replace(/\\/g, '/')
+              )}/${folderPath.source}`,
+              folderPath.flags
+            )
+          : new RegExp(
+              `^${escapeRegExp(
+                path.resolve(basePath, folderPath).replace(/\\/g, '/')
+              )}`
+            )
   );
 }
 

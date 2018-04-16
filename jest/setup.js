@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 'use strict';
 
@@ -82,16 +80,10 @@ jest
     const ReactNative = require.requireActual('ReactNative');
     const NativeMethodsMixin =
       ReactNative.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.NativeMethodsMixin;
-    [
-      'measure',
-      'measureInWindow',
-      'measureLayout',
-      'setNativeProps',
-      'focus',
-      'blur',
-    ].forEach((key) => {
+
+    const mockFunction = (key) => {
       let warned = false;
-      NativeMethodsMixin[key] = function() {
+      return function() {
         if (warned) {
           return;
         }
@@ -103,6 +95,18 @@ jest
             'native environment.',
         );
       };
+    };
+
+    [
+      'measure',
+      'measureInWindow',
+      'measureLayout',
+      'setNativeProps',
+      'focus',
+      'blur',
+    ].forEach((key) => {
+      NativeMethodsMixin[key] = mockFunction(key);
+      ReactNative.NativeComponent.prototype[key] = mockFunction(key);
     });
     return ReactNative;
   })
@@ -115,6 +119,7 @@ const mockNativeModules = {
   },
   AppState: {
     addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
   },
   AsyncLocalStorage: {
     multiGet: jest.fn((keys, callback) => process.nextTick(() => callback(null, []))),
@@ -292,6 +297,7 @@ const mockNativeModules = {
   BlobModule: {
     BLOB_URI_SCHEME: 'content',
     BLOB_URI_HOST: null,
+    addNetworkingHandler: jest.fn(),
     enableBlobSupport: jest.fn(),
     disableBlobSupport: jest.fn(),
     createFromParts: jest.fn(),
@@ -318,11 +324,7 @@ Object.keys(mockNativeModules).forEach(module => {
 });
 
 jest
-  .doMock('NativeModules', () => mockNativeModules)
-  .doMock('ReactNativePropRegistry', () => ({
-    register: id => id,
-    getByID: () => mockEmptyObject,
-  }));
+  .doMock('NativeModules', () => mockNativeModules);
 
 jest.doMock('requireNativeComponent', () => {
   const React = require('react');

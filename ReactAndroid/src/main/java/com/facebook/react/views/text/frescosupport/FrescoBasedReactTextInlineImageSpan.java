@@ -1,14 +1,14 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 package com.facebook.react.views.text.frescosupport;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import javax.annotation.Nullable;
 
 import android.content.res.Resources;
@@ -48,6 +48,7 @@ public class FrescoBasedReactTextInlineImageSpan extends TextInlineImageSpan {
   private final @Nullable Object mCallerContext;
 
   private int mHeight;
+  private int mTintColor;
   private Uri mUri;
   private int mWidth;
   private ReadableMap mHeaders;
@@ -58,6 +59,7 @@ public class FrescoBasedReactTextInlineImageSpan extends TextInlineImageSpan {
       Resources resources,
       int height,
       int width,
+      int tintColor,
       @Nullable Uri uri,
       ReadableMap headers,
       AbstractDraweeControllerBuilder draweeControllerBuilder,
@@ -70,6 +72,7 @@ public class FrescoBasedReactTextInlineImageSpan extends TextInlineImageSpan {
     mCallerContext = callerContext;
 
     mHeight = height;
+    mTintColor = tintColor;
     mWidth = width;
     mUri = (uri != null) ? uri : Uri.EMPTY;
     mHeaders = headers;
@@ -145,7 +148,11 @@ public class FrescoBasedReactTextInlineImageSpan extends TextInlineImageSpan {
 
       mDrawable = mDraweeHolder.getTopLevelDrawable();
       mDrawable.setBounds(0, 0, mWidth, mHeight);
+      if(mTintColor != 0) {
+        mDrawable.setColorFilter(mTintColor, PorterDuff.Mode.SRC_IN);
+      }
       mDrawable.setCallback(mTextView);
+
     }
 
     // NOTE: This drawing code is copied from DynamicDrawableSpan
