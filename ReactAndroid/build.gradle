@@ -1,4 +1,7 @@
-// Copyright 2015-present Facebook. All Rights Reserved.
+// Copyright (c) 2015-present, Facebook, Inc.
+
+// This source code is licensed under the MIT license found in the
+// LICENSE file in the root directory of this source tree.
 
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
@@ -294,12 +297,12 @@ dependencies {
     compile 'javax.inject:javax.inject:1'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.facebook.fbui.textlayoutbuilder:textlayoutbuilder:1.0.0'
-    compile 'com.facebook.fresco:fresco:1.8.1'
-    compile 'com.facebook.fresco:imagepipeline-okhttp3:1.8.1'
+    compile 'com.facebook.fresco:fresco:1.9.0'
+    compile 'com.facebook.fresco:imagepipeline-okhttp3:1.9.0'
     compile 'com.facebook.soloader:soloader:0.3.0'
     compile 'com.google.code.findbugs:jsr305:3.0.0'
-    compile 'com.squareup.okhttp3:okhttp:3.8.0'
-    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.8.0'
+    compile 'com.squareup.okhttp3:okhttp:3.10.0'
+    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.10.0'
     compile 'com.squareup.okio:okio:1.14.0'
     compile 'org.webkit:android-jsc:r174650'
 

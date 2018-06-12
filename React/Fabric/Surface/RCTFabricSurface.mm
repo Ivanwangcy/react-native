@@ -17,7 +17,7 @@
 #import <React/RCTSurfaceDelegate.h>
 #import <React/RCTSurfaceRootView.h>
 #import <React/RCTSurfaceView.h>
-#import <React/RCTTouchHandler.h>
+#import <React/RCTSurfaceTouchHandler.h>
 #import <React/RCTUIManagerUtils.h>
 #import <React/RCTUtils.h>
 
@@ -28,7 +28,6 @@
   // Immutable
   RCTSurfacePresenter *_surfacePresenter;
   NSString *_moduleName;
-  ReactTag _rootTag;
 
   // Protected by the `_mutex`
   std::mutex _mutex;
@@ -40,7 +39,7 @@
 
   // The Main thread only
   RCTSurfaceView *_Nullable _view;
-  RCTTouchHandler *_Nullable _touchHandler;
+  RCTSurfaceTouchHandler *_Nullable _touchHandler;
 }
 
 - (instancetype)initWithBridge:(RCTBridge *)bridge
@@ -71,6 +70,8 @@
     _maximumSize = CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX);
 
     _stage = RCTSurfaceStageSurfaceDidInitialize;
+
+    _touchHandler = [RCTSurfaceTouchHandler new];
 
     [self _run];
   }
@@ -103,6 +104,7 @@
 
   if (!_view) {
     _view = [[RCTSurfaceView alloc] initWithSurface:(RCTSurface *)self];
+    [_touchHandler attachToView:_view];
   }
 
   return _view;
@@ -189,8 +191,9 @@
 - (CGSize)sizeThatFitsMinimumSize:(CGSize)minimumSize
                       maximumSize:(CGSize)maximumSize
 {
-  // TODO: Not supported yet.
-  return CGSizeZero;
+  return [_surfacePresenter sizeThatFitsMinimumSize:minimumSize
+                                        maximumSize:maximumSize
+                                            surface:self];
 }
 
 #pragma mark - Size Constraints
@@ -214,7 +217,9 @@
     _minimumSize = minimumSize;
   }
 
-  // TODO: Not supported yet.
+  return [_surfacePresenter setMinimumSize:minimumSize
+                               maximumSize:maximumSize
+                                   surface:self];
 }
 
 - (CGSize)minimumSize

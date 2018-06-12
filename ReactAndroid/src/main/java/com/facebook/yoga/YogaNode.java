@@ -234,9 +234,15 @@ public class YogaNode implements Cloneable {
    * {@link YogaNode} is shared between two or more YogaTrees.
    */
   @Nullable
-  public
-  YogaNode getOwner() {
+  public YogaNode getOwner() {
     return mOwner;
+  }
+
+  /** @deprecated Use #getOwner() instead. This will be removed in the next version. */
+  @Deprecated
+  @Nullable
+  public YogaNode getParent() {
+    return getOwner();
   }
 
   public int indexOf(YogaNode child) {

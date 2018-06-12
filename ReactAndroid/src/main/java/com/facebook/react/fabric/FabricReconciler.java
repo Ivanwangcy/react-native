@@ -8,7 +8,6 @@
 package com.facebook.react.fabric;
 
 import android.util.Log;
-import android.util.SparseArray;
 import com.facebook.react.common.ArrayUtils;
 import com.facebook.react.uimanager.ReactShadowNode;
 import com.facebook.react.uimanager.UIViewOperationQueue;
@@ -61,7 +60,7 @@ public class FabricReconciler {
       }
       enqueueUpdateProperties(newNode);
       manageChildren(prevNode, prevNode.getChildrenList(), newNode.getChildrenList());
-      prevNode.setOriginalReactShadowNode(newNode);
+      newNode.setOriginalReactShadowNode(null);
     }
     int firstRemovedOrAddedViewIndex = sameReactTagIndex;
 
@@ -78,7 +77,7 @@ public class FabricReconciler {
       viewsToAdd.add(new ViewAtIndex(newNode.getReactTag(), k));
       List previousChildrenList = newNode.getOriginalReactShadowNode() == null ? null : newNode.getOriginalReactShadowNode().getChildrenList();
       manageChildren(newNode, previousChildrenList, newNode.getChildrenList());
-      newNode.setOriginalReactShadowNode(newNode);
+      newNode.setOriginalReactShadowNode(null);
       addedTags.add(newNode.getReactTag());
     }
 
@@ -118,19 +117,23 @@ public class FabricReconciler {
   }
 
   private void enqueueUpdateProperties(ReactShadowNode node) {
-    if (node.getNewProps() == null) {
-      return;
-    }
+    int reactTag = node.getReactTag();
     if (DEBUG) {
       Log.d(
-          TAG,
-          "manageChildren.enqueueUpdateProperties " +
-              "\n\ttag: " + node.getReactTag() +
-              "\n\tviewClass: " + node.getViewClass() +
-              "\n\tnewProps: " + node.getNewProps());
+        TAG,
+        "manageChildren.enqueueUpdateProperties " +
+          "\n\ttag: " + reactTag +
+          "\n\tviewClass: " + node.getViewClass() +
+          "\n\tinstanceHandle: " + node.getInstanceHandle() +
+          "\n\tnewProps: " + node.getNewProps());
     }
-    uiViewOperationQueue.enqueueUpdateProperties(
-        node.getReactTag(), node.getViewClass(), node.getNewProps());
-  }
 
+    if (node.getNewProps() != null) {
+      uiViewOperationQueue.enqueueUpdateProperties(
+        reactTag, node.getViewClass(), node.getNewProps());
+    }
+
+    uiViewOperationQueue.enqueueUpdateInstanceHandle(
+      reactTag, node.getInstanceHandle());
+  }
 }
